@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h> // sleep()関数を使う
 
 void my_init_cells(const int height, const int width, int cell[height][width], FILE *fp) {
@@ -12,11 +13,49 @@ void my_init_cells(const int height, const int width, int cell[height][width], F
   }
   else {
     int x,y;
-    while(fgetc(fp) != '\n') {
-        continue;
-    }
-    while(fscanf(fp, "%d %d\n", &x, &y) != EOF) {
-      cell[y][x] = 1;    
+    int i;
+    i = 0;
+    int x_now, y_now;
+    x_now = 0;
+    y_now = 0;
+    int run_count;
+    char buf;
+    while((buf = fgetc(fp)) != EOF) {
+      if(buf == '#') {
+        while(fgetc(fp) != '\n') {
+          continue;
+        }
+      }
+      else {
+        if(buf >= '0' && buf <= '9') {
+          fseek(fp, -1, SEEK_CUR);
+          fscanf(fp, "%d", &run_count);
+          char buf2;
+          if((buf2 = fgetc(fp)) == 'o') {
+            for(i = 0; i < run_count; ++i) {
+              cell[y_now][x_now+i] = 1;
+            }
+            x_now += run_count;
+          }
+          else if(buf2 == 'b') {
+            x_now += run_count;
+          }
+        }
+        else if(buf == 'b') {
+          x_now += 1;
+        }
+        else if(buf == 'o') {
+          cell[y_now][x_now] = 1;
+          x_now += 1;
+        }
+        else if(buf == '$') {
+          x_now = 0;
+          y_now += 1;
+        }
+        else if(buf == '!') {
+          break;
+        }
+      }
     }
   }
 }
@@ -264,7 +303,7 @@ int main(int argc, char **argv)
   double r = cell_rate(height, width, cell);
   fprintf(fp, "Rate of living cells: %lf%\n", r);
   sleep(1); // 1秒休止
-  fprintf(fp,"\e[%dA",height+4);//height+3 の分、カーソルを上に戻す(壁2、表示部1)
+  fprintf(fp,"\e[%dA",height+4);//height+4 の分、カーソルを上に戻す(壁2、表示部2)
 
   /* 世代を進める*/
   for (int gen = 1 ;; gen++) {
@@ -273,7 +312,7 @@ int main(int argc, char **argv)
     double r = cell_rate(height, width, cell);
     fprintf(fp, "Rate of living cells: %lf%\n", r);
     sleep(1); //1秒休止する
-    fprintf(fp,"\e[%dA",height+4);//height+3 の分、カーソルを上に戻す(壁2、表示部1)
+    fprintf(fp,"\e[%dA",height+4);//height+4 の分、カーソルを上に戻す(壁2、表示部2)
   }
 
   return EXIT_SUCCESS;

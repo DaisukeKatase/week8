@@ -264,7 +264,7 @@ int main(int argc, char **argv)
   double r = cell_rate(height, width, cell);
   fprintf(fp, "Rate of living cells: %lf%\n", r);
   sleep(1); // 1秒休止
-  fprintf(fp,"\e[%dA",height+4);//height+3 の分、カーソルを上に戻す(壁2、表示部1)
+  fprintf(fp,"\e[%dA",height+4);//height+4 の分、カーソルを上に戻す(壁2、表示部2)
 
   /* 世代を進める*/
   for (int gen = 1 ;; gen++) {
@@ -273,7 +273,7 @@ int main(int argc, char **argv)
     double r = cell_rate(height, width, cell);
     fprintf(fp, "Rate of living cells: %lf%\n", r);
     sleep(1); //1秒休止する
-    fprintf(fp,"\e[%dA",height+4);//height+3 の分、カーソルを上に戻す(壁2、表示部1)
+    fprintf(fp,"\e[%dA",height+4);//height+4 の分、カーソルを上に戻す(壁2、表示部2)
   }
 
   return EXIT_SUCCESS;
